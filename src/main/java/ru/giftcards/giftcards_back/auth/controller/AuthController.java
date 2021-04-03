@@ -1,25 +1,23 @@
 package ru.giftcards.giftcards_back.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.giftcards.giftcards_back.auth.dto.AuthenticationRequestDto;
 import ru.giftcards.giftcards_back.auth.dto.RegisterUserDto;
 import ru.giftcards.giftcards_back.auth.entity.User;
 import ru.giftcards.giftcards_back.auth.security.jwt.JwtTokenProvider;
 import ru.giftcards.giftcards_back.auth.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/auth/")
@@ -63,5 +61,14 @@ public class AuthController {
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
         }
+    }
+
+    @GetMapping(value = "/profile")
+    public ResponseEntity<?> profileUser(HttpServletRequest request)
+    {
+        String token = request.getHeader("Authorization").substring(7);
+        String username = jwtTokenProvider.getUsername(token);
+
+        return ResponseEntity.ok(username);
     }
 }
